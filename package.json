@@ -1,6 +1,6 @@
 {
   "name": "pert",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "pert diagram calculator",
   "main": "pert.coffee",
   "bin": {
