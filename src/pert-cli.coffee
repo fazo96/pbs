@@ -9,8 +9,9 @@ ex = [{id: 0, depends: [], duration: 2}, { id: 1, depends: [0], duration: 3},{id
 
 cli
   .version '0.1'
-  .usage 'loads activity data from JSON and computes the possible activity delays'
-  .option '--verbose', 'be verbose (for debugging)'
+  .description 'loads activity data from JSON and computes the possible activity delays'
+  .usage '<command> [options] [args]'
+  .option '-v, --verbose', 'be verbose (for debugging)'
 
 didSomething = no
 

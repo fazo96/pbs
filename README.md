@@ -8,8 +8,10 @@ Make sure you have `node` and `npm` installed and working
 
 __From git__
 
-1. clone this repo and run `build.sh`
-2. run `bin/pert`
+1. clone this repo
+2. run `npm install` in the root of the repo, then run `bower install` in `client/` if you need to use the Web GUI
+3. run `npm run-script build` to compile all files
+4. the binary should now be in `bin/pert`
 
 __From npm__
 
@@ -18,18 +20,22 @@ __From npm__
 
 ## Usage
 
-    Usage: pert loads activity data from JSON and computes the possible activity delays
+    Usage: pert <command> [options] [args]
+
+    loads activity data from JSON and computes the possible activity delays
 
     Commands:
 
       example                       show an example of the JSON data format
       calculate|c [options] <file>  calculate data on given JSON document
+      graph|g <file>                serve HTTP GUI with pert graph of given JSON document
 
     Options:
 
       -h, --help     output usage information
       -V, --version  output the version number
-      --verbose      be verbose (for debugging)
+      -v, --verbose  be verbose (for debugging)
+
 
 This is the help information for the `pert calculate` command:
 
@@ -44,7 +50,7 @@ This is the help information for the `pert calculate` command:
 
 ## Data format
 
-This is a valid input document:
+This is a valid input document (extra data is ignored but not thrashed):
 
 ```json
 [
