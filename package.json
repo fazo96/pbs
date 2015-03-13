@@ -5,7 +5,7 @@
   "main": "lib/pert.js",
   "bin": {
     "pert": "./bin/pert"
-   },
+  },
   "scripts": {
     "prepublish": "scripts/build.sh",
     "build": "scripts/build.sh",
@@ -23,7 +23,8 @@
   "homepage": "https://github.com/fazo96/pert",
   "dependencies": {
     "chalk": "^1.0.0",
-    "commander": "^2.6.0"
+    "commander": "^2.6.0",
+    "express": "^4.12.2"
   },
   "devDependencies": {
     "coffee-script": "^1.9.1"
