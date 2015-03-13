@@ -1,0 +1,22 @@
+{
+  "name": "pert",
+  "version": "0.0.1",
+  "description": "pert diagram calculator",
+  "main": "pert.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/fazo96/pert.git"
+  },
+  "author": "Enrico Fasoli (fazo96)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fazo96/pert/issues"
+  },
+  "homepage": "https://github.com/fazo96/pert",
+  "dependencies": {
+    "chalk": "^1.0.0"
+  }
+}
