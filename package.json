@@ -2,13 +2,14 @@
   "name": "pert",
   "version": "0.1.0",
   "description": "pert diagram calculator",
-  "main": "pert.coffee",
+  "main": "lib/pert.js",
   "bin": {
     "pert": "./bin/pert"
    },
   "scripts": {
-    "prepublish": "./build.sh",
-    "build": "./build.sh"
+    "prepublish": "scripts/build.sh",
+    "build": "scripts/build.sh",
+    "clean": "scripts/clean.sh"
   },
   "repository": {
     "type": "git",
