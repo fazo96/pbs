@@ -57,8 +57,14 @@ module.exports = class Pert
       if day is d then return
     @days.push day
 
-  calculate: (options) ->
-    @calculateEndDay @toActivity @highestID()
-    results = activities: @list, days: @days
-    if options?.json then JSON.stringify results else results 
+  setData: (data) ->
+    @list = data
+    return @
 
+  calculate: (options) ->
+    h = @highestID()
+    @list.forEach (x) =>
+      @log '('+x.id+'/'+h+')'
+      @calculateEndDay x
+    results = activities: @list, days: @days
+    if options?.json then JSON.stringify results else results

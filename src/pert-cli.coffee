@@ -42,7 +42,8 @@ cli
   .command 'graph <file>'
   .description 'serve HTTP GUI with pert graph of given JSON document'
   .alias 'g'
-  .action (file) ->
+  .option '-r, --read-only', 'disallow data editing'
+  .action (file,options) ->
     didSomething = yes
     fs.readFile file, (error,content) ->
       if error then err error
@@ -52,6 +53,9 @@ cli
         app = express()
         app.use express.static 'client'
         app.get '/data', (req,res) -> res.json data
+        if !options.readOnly then app.post '/data', (req,res) ->
+          data = req.body
+          pert.setData(data).calculate()
         app.listen 3000
         console.log chalk.green('Started Web Server'), 'on port', chalk.bold(3000)
 
