@@ -11,6 +11,7 @@ buildGraph = (data) ->
     connections.push
       from: x.startDay, to: x.endDay
       label: x.id+" ("+(if x.permittedDelay > 0 then x.duration+"/"+(x.duration+x.permittedDelay) else x.duration)+")"
+      color: if !x.permittedDelay then 'red'
     if x.permittedDelay > 0
       connections.push
         from: x.endDay

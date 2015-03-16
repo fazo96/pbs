@@ -40,6 +40,8 @@ module.exports = class Pert
     item.depends.forEach (x) =>
       @log "checking permittedDelay to dependency", x, "of", item
       i = @toActivity x
+      if !i.dependant? then i.dependant = [item.id]
+      else i.dependant.push item.id
       if !i.permittedDelay?
         i.permittedDelay = item.startDay - @calculateEndDay i
         @log "written permittedDelay to dependency", x, "of", item, "as", i.permittedDelay
@@ -61,10 +63,15 @@ module.exports = class Pert
     @list = data
     return @
 
-  calculate: (options) ->
+  calculate: (options,cb) ->
     h = @highestID()
     @list.forEach (x) =>
       @log '('+x.id+'/'+h+')'
       @calculateEndDay x
     results = activities: @list, days: @days
-    if options?.json then JSON.stringify results else results
+    if options?.json
+      if cb? then cb(JSON.stringify results)
+      JSON.stringify results
+    else
+      if cb? then cb(results)
+      results
