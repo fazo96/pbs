@@ -1,4 +1,5 @@
 node_modules/
+client/pert.js
 client/pert-ui.js
 client/bower_components/
 test/
