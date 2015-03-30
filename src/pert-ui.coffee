@@ -1,8 +1,18 @@
 $.get 'data', (d) ->
   # Serve the server data
-  list = d
-  console.log list
-  buildGraph list
+  buildTimeline d
+  buildGraph d
+
+toDates = (list, startDay) ->
+  list.map (i) ->
+    r = content: ""+i.id, id: i.id
+    if i.startDay? then r.start = moment(startDay).add(i.startDay, 'days').format 'YYYY-MM-DD'
+    if i.endDay? then r.end = moment(startDay).add(i.endDay, 'days').format 'YYYY-MM-DD'
+    return r
+
+buildTimeline = (data) ->
+  console.log toDates data.activities
+  timeline = new vis.Timeline (document.getElementById 'timeline'), (toDates data.activities), {}
 
 buildGraph = (data) ->
   nodes = data.days.map (x) -> {id: x, label: ""+x}
