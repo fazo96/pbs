@@ -1,7 +1,4 @@
-chalk = require 'chalk'
-fs = require 'fs'
-
-module.exports = class Pert
+class Pert
   constructor: (@list, @verbose) ->
     @days = []
 
@@ -75,3 +72,5 @@ module.exports = class Pert
     else
       if cb? then cb(results)
       results
+
+if module? then module.exports = Pert

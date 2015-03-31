@@ -1,7 +1,4 @@
-$.get 'data', (d) ->
-  # Serve the server data
-  buildTimeline d
-  buildGraph d
+console.log 'Pert ui'
 
 toDates = (list, startDay) ->
   list.map (i) ->
@@ -37,3 +34,11 @@ buildGraph = (data) ->
       edges:
         style: 'arrow'
     network = new vis.Network (document.getElementById 'pert'), { nodes: nodes, edges: connections }, options
+
+data = localStorage.getItem 'ganttpert'
+if data
+  jdata = JSON.parse data
+  if jdata
+    buildGraph new Pert(jdata).calculate()
+  else console.log 'error parsing json:\n'+data
+else console.log 'no data'
