@@ -72,5 +72,4 @@ class Pert
     else
       if cb? then cb(results)
       results
-
 if module? then module.exports = Pert
