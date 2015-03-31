@@ -32,10 +32,16 @@ buildGraph = (data) ->
         style: 'arrow'
     network = new vis.Network (document.getElementById 'pert'), { nodes: nodes, edges: connections }, options
 
-data = localStorage.getItem 'ganttpert'
-if data
-  jdata = JSON.parse data
-  if jdata
-    buildGraph new Pert(jdata).calculate()
-  else console.log 'error parsing json:\n'+data
-else console.log 'no data'
+fromLocalStorage = ->
+  data = localStorage.getItem 'ganttpert'
+  if data
+    try
+      jdata = JSON.parse data
+    catch e
+      return swal 'JSON Error', e, 'error'
+    if jdata
+      buildGraph new Pert(jdata).calculate()
+    else return swal 'Error', 'no JSON?', 'error'
+  else swal 'Error', 'no data to parse', 'error'
+
+fromLocalStorage()
