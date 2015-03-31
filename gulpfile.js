@@ -7,6 +7,7 @@ var clean = require('gulp-clean')
 
 gulp.task('css',function(){
   cssFiles = ["src/*.css","bower_components/vis/dist/vis.min.css",
+      "bower_components/sweetalert/lib/sweet-alert.css",
       "bower_components/bootstrap/dist/css/bootstrap.css"]
   return gulp.src(cssFiles)
                         .pipe(minifyCSS())
@@ -22,6 +23,7 @@ gulp.task('js',function(){
   jsFiles = ["src/*.js",
       "bower_components/jquery/dist/jquery.js",
       "bower_components/angular/angular.js",
+      "bower_components/sweetalert/lib/sweet-alert.js",
       "bower_components/angular-ui-router/release/angular-ui-router.js",
       "bower_components/vis/dist/vis.min.js"]
   return gulp.src(jsFiles).pipe(uglify({ mangle: false }))

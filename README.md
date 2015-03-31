@@ -2,7 +2,7 @@
 
 Pert is a small web app built to assist in working with Project Breakdown Structures.
 
-It should be accessible [here](http://fazo96.github.io/pert)
+It should be accessible [here](http://pert.divshot.io)
 
 ## Features
 
@@ -26,6 +26,13 @@ This is a valid input document (extra data is ignored but not thrashed):
   {"id": 5, "duration": 2, "depends": [2,3,4]}
 ]
 ```
+
+## Development
+
+1. Clone the repo
+2. make sure you have [gulp](http://gulpjs.com)
+3. run `npm install && bower install && gulp` to build the project
+4. the resulting static website is in `dist/`
 
 ## License
 

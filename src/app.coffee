@@ -4,20 +4,20 @@ pertApp.config ($stateProvider,$urlRouterProvider) ->
   $urlRouterProvider.otherwise '/'
   $stateProvider.state 'home',
     url: '/'
-    templateUrl: 'dist/home.html'
+    templateUrl: 'home.html'
     controller: ($scope) ->
       $scope.rawdata = localStorage.getItem 'ganttpert'
+      $scope.saveData = ->
+        swal 'Saved', 'Your data has been updated', 'success'
+        localStorage.setItem 'ganttpert', $('#ta').val()
 
   $stateProvider.state 'pert',
     url: '/pert'
-    templateUrl: 'dist/pert.html'
+    templateUrl: 'pert.html'
     controller: pertController
 
 
-$('#save').click ->
-  console.log 'save'
-  localStorage.setItem 'ganttpert', $('#ta').val()
-
+pertController = ($scope) ->
   toDates = (list, startDay) ->
     list.map (i) ->
       r = content: ""+i.id, id: i.id
@@ -25,8 +25,6 @@ $('#save').click ->
       if i.endDay? then r.end = moment(startDay).add(i.endDay, 'days').format 'YYYY-MM-DD'
       return r
 
-pertController = ($scope) ->
-  console.log 'controller'
   buildTimeline = (data) ->
     timeline = new vis.Timeline (document.getElementById 'timeline'), (toDates data.activities), {}
 
