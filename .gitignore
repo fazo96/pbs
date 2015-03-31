@@ -1,4 +1,5 @@
 bower_components/
+.divshot-cache/
 node_modules/
 test/
 dist/
