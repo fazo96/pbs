@@ -1,4 +1,8 @@
 bower_components/
+node_modules/
 test/
 lib/
 *.js
+!gulpfile.js
+*.css
+!src/*.css
