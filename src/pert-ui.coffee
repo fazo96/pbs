@@ -8,7 +8,6 @@ toDates = (list, startDay) ->
     return r
 
 buildTimeline = (data) ->
-  console.log toDates data.activities
   timeline = new vis.Timeline (document.getElementById 'timeline'), (toDates data.activities), {}
 
 buildGraph = (data) ->
@@ -25,8 +24,6 @@ buildGraph = (data) ->
         to: x.endDay+x.permittedDelay
         color: 'green'
         label: x.id+" ("+x.permittedDelay+")"
-  console.log nodes
-  console.log connections
   if network
     network.setData { nodes: nodes, edges: edges }
   else

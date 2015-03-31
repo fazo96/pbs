@@ -3,15 +3,22 @@
   <head>
     <title>Pert</title>
     <link rel="stylesheet" href="bower_components/vis/dist/vis.min.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="dist/style.css">
   </head>
   <body>
+    
+    <div class="container">
+      <div id="pert"></div>
+      <div class="text-center">
+        <a href="index.html" class="btn btn-primary">Edit Data</a>
+      </div>
+      <!--<div id="timeline"></div>-->
+    </div>
+
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/vis/dist/vis.min.js"></script>
     <script src="bower_components/moment/moment.js"></script>
-    <div id="pert"></div>
-    <a href="index.html">edit data</a>
-    <!--<div id="timeline"></div>-->
     <script src="dist/pert.js"></script>
     <script src="dist/pert-ui.js"></script>
   </body>
