@@ -1,8 +1,8 @@
 pertApp = angular.module 'pertApp', ['ui.router']
 
-pertApp.config ($stateProvider,$urlRouterProvider) ->
+pertApp.config ($stateProvider,$urlRouterProvider,$locationProvider) ->
   $urlRouterProvider.otherwise '/'
-
+  $locationProvider.html5Mode enabled: yes, requireBase: no
   $stateProvider.state 'home',
     url: '/'
     templateUrl: 'welcome.html'
