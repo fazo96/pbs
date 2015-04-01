@@ -1,8 +1,8 @@
-# Pert
+# PBS
 
-Pert is a small web app built to assist in working with Project Breakdown Structures.
+PBS is a small web app built to assist in working with Project Breakdown Structures.
 
-It should be accessible [here](http://pert.divshot.io)
+It should be accessible [here](http://pbsapp.divshot.io)
 
 ## Features
 
