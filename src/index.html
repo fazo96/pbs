@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html ng-app="pertApp">
   <head>
-    <title>Pert</title>
+    <title>PBS Wizard</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="vis.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="bootstrap.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="sweet-alert.css">
@@ -29,16 +30,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#/">Pert</a>
+          <a class="navbar-brand" href="#/">
+            <i class="fa fa-bar-chart"></i> PBS</a>
         </div>
         <div class="collapse navbar-collapse" id="navbar-body">
           <ul class="nav navbar-nav">
-            <li><a href="#/edit">Edit</a></li>
-            <li><a href="#/rawedit">RawEdit</a></li>
-            <li><a href="#/table">Table</a></li>
-            <li><a href="#/pert">Pert</a></li>
-            <li><a href="#/gantt">Gantt</a></li>
+            <li><a ui-sref="edit">Edit</a></li>
+            <li><a ui-sref="rawedit">RawEdit</a></li>
+            <li><a ui-sref="table">Table</a></li>
+            <li><a ui-sref="pert">Pert</a></li>
+            <li><a ui-sref="gantt">Gantt</a></li>
+            <li class="github"><a href="http://github.com/fazo96/pert">GitHub</a></li>
           </ul>
+          <span class="pull-right github"><a href="http://github.com/fazo96/pert"><i class="fa fa-2x fa-github"></i></a></span>
         </div>
       </div>
     </nav>

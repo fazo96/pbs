@@ -5,7 +5,7 @@ pertApp.config ($stateProvider,$urlRouterProvider) ->
 
   $stateProvider.state 'home',
     url: '/'
-    templateUrl: 'README.html'
+    templateUrl: 'welcome.html'
     controller: ($scope) -> return
 
   $stateProvider.state 'rawedit',

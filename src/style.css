@@ -17,6 +17,18 @@
   margin-bottom: 1em;
 }
 
+span.github {
+  margin-top: .75em;
+}
+
+@media(max-width: 765px){
+  span.github { display: none }
+} 
+
+@media(min-width: 766px){
+  li.github { display: none }
+}
+
 #ta {
   margin: 1em 0 1em 0;
 }
