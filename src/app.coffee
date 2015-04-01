@@ -11,11 +11,7 @@ pertApp.config ($stateProvider,$urlRouterProvider) ->
   $stateProvider.state 'rawedit',
     url: '/rawedit'
     templateUrl: 'rawedit.html'
-    controller: ($scope) ->
-      $scope.rawdata = localStorage.getItem 'ganttpert'
-      $scope.saveData = ->
-        swal 'Saved', 'Your data has been updated', 'success'
-        localStorage.setItem 'ganttpert', $('#ta').val()
+    controller: pertController
 
   $stateProvider.state 'edit',
     url: '/edit'
@@ -38,20 +34,28 @@ pertApp.config ($stateProvider,$urlRouterProvider) ->
     controller: pertController
 
 pertController = ($scope) ->
-  $scope.toLocalStorage = (data) ->
+  $scope.toLocalStorage = (data,options) ->
+    options = options || {}
     try
+      console.log data
       localStorage.setItem 'ganttpert', JSON.stringify data
-      swal 'Ok', 'Data updated', 'success'
+      unless options.silent
+        swal 'Ok', 'Data updated', 'success'
+      $scope.$broadcast 'dataChanged'
     catch e
-      swal 'Error', 'could not save data', 'error'
-  $scope.fromLocalStorage = (item) ->
-    data = localStorage.getItem item || 'ganttpert'
-    if data
-      try
-        jdata = JSON.parse data
-      catch e
-        return swal 'JSON Error', e, 'error'
-      if jdata
-        return new Pert(jdata).calculate()
-      else return swal 'Error', 'no JSON?', 'error'
-    else swal 'Error', 'no data to parse', 'error'
+      swal 'Error', e, 'error'
+
+  $scope.fromLocalStorage = (options) ->
+    options = options || {}
+    data = localStorage.getItem options.name || 'ganttpert'
+    try
+      jdata = JSON.parse data
+    catch e
+      unless options.silent
+        swal 'JSON Error', e, 'error'
+      if options.raw
+        return []
+      else return activities: [], days: []
+    if options.raw
+      return jdata
+    else return new Pert(jdata).calculate()

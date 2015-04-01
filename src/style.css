@@ -6,7 +6,15 @@
 }
 
 .container {
-  padding-top: 4em;
+  padding-top: 5em;
+}
+
+.input-group.dependencies {
+  margin-bottom: 1em;
+}
+
+.input-group.duration {
+  margin-bottom: 1em;
 }
 
 #ta {

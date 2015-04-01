@@ -27,6 +27,8 @@ pertApp.controller 'pertDiagController', ($scope) ->
         edges:
           style: 'arrow'
       network = new vis.Network (document.getElementById 'pertDiagram'), { nodes: nodes, edges: connections }, options
+  $scope.$on 'dataChanged', ->
+    $scope.buildGraph $scope.fromLocalStorage()
   $scope.buildGraph $scope.fromLocalStorage()
 
 pertApp.controller 'ganttDiagController', ($scope) ->
@@ -39,40 +41,49 @@ pertApp.controller 'ganttDiagController', ($scope) ->
   $scope.buildTimeline = (data) ->
     if !data? then return
     timeline = new vis.Timeline (document.getElementById 'timeline'), ($scope.toDates data.activities), {}
+  $scope.$on 'dataChanged', ->
+    $scope.buildTimeline $scope.fromLocalStorage()
   $scope.buildTimeline $scope.fromLocalStorage()
+
+pertApp.controller 'rawEditorController', ($scope) ->
+  $scope.rawdata = $scope.fromLocalStorage silent: yes, raw: yes
 
 pertApp.controller 'editorController', ($scope) ->
   $scope.clone = (id) ->
-    for i,j of $scope.fromLocalStorage().activities
-      console.log j
+    for i,j of $scope.fromLocalStorage({raw: yes, silent: yes}).activities
       if j.id is id
         $scope.addNew j.id, j.duration, j.depends
         swal 'Ok', id+' has been cloned', 'success'
         return
     swal 'Ops', 'could not find '+id, 'warning'
+
   $scope.delete = (id) ->
-    rawdata = localStorage.getItem 'ganttpert'
-    try
-      newdata = JSON.parse rawdata
-    catch e
-      swal 'Error', e, 'error'
-    if newdata
-      l = []
-      for i,j of newdata
-        if j.id isnt id
-          l.push j
-      localStorage.setItem 'ganttpert', JSON.stringify l
-      swal 'Ok', 'done', 'success'
+    newdata = $scope.fromLocalStorage raw: yes
+    l = []
+    for i,j of newdata
+      if j.id isnt id
+        l.push j
+    $scope.toLocalStorage l, silent: yes
+    swal 'Ok', 'done', 'success'
+
   $scope.addNew = (id, dur, deps) ->
-    ndur = dur || $('#new-duration').val()
-    nid = id || $('#new-id').val()
-    ndeps = deps || []
-    rawdata = localStorage.getItem 'ganttpert'
+    dur ?= $('#new-duration').val()
+    id ?= $('#new-id').val()
+    if !deps?
+      deps = $('#new-deps').val().split(' ')
+      if deps.length is 1 and deps[0] is ''
+        deps = []
     try
-      newdata = JSON.parse rawdata
+      dur = parseInt dur
     catch e
-      swal 'Error', e, 'error'
-    newdata.push {id: nid, duration: dur, depends: ndeps}
-    $scope.toLocalStorage newdata
-  data = $scope.fromLocalStorage()
-  if data? then $scope.list = data.activities
+      return swal 'Error', 'duration must be an integer', 'error'
+    newdata = $scope.fromLocalStorage silent: yes, raw: yes
+    newdata.push { id: id, duration: dur, depends: deps }
+    $scope.toLocalStorage newdata, silent: yes
+
+  $scope.refreshEditor = ->
+    console.log 'drawing editor'
+    data = $scope.fromLocalStorage { silent: yes, raw: yes }
+    $scope.list = data || []
+  $scope.$on 'dataChanged', $scope.refreshEditor
+  $scope.refreshEditor()

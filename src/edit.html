@@ -1,4 +1,4 @@
-<div ng-controller="editorController">
+<div ng-controller="editorController" class="activity-list">
   <div class="panel panel-default" ng-repeat="item in list">
     <div class="panel-heading">
       <div class="input-group">
@@ -7,11 +7,11 @@
       </div>
     </div>
     <div class="panel-body">
-      <div class="input-group">
+      <div class="input-group duration">
         <span class="input-group-addon">Duration</span>
         <input class="form-control" value="{{item.duration}}" placeholder="(days)">
       </div>
-      <div class="input-group">
+      <div class="input-group dependencies">
         <span class="input-group-addon">Dependencies</span>
         <input class="form-control" placeholder="id1 id2 id3" value="{{item.depends.join(' ')}}">
       </div>
@@ -24,19 +24,19 @@
     <div class="panel-heading">
       <div class="input-group">
         <span class="input-group-addon">ID</span>
-        <input class="form-control" placeholder="New Activity" id="new-id">
+        <input class="form-control" placeholder="New Activity" ng-model="newid" id="new-id">
       </div>
     </div>
     <div class="panel-body">
-      <div class="input-group">
+      <div class="input-group duration">
         <span class="input-group-addon">Duration</span>
         <input class="form-control" id="new-duration" placeholder="(days)">
       </div>
-      <div class="input-group">
+      <div class="input-group dependencies">
         <span class="input-group-addon">Dependencies</span>
-        <input class="form-control" placeholder="id1 id2 id3">
+        <input class="form-control" placeholder="id1 id2 id3" id="new-deps">
       </div>
-      <button ng-click="addNew($event)" class="btn btn-primary">Add</button>
+      <button ng-click="addNew()" class="btn btn-primary">Add</button>
     </div>
   </div>
 </div>
