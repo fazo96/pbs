@@ -2,9 +2,18 @@
   height: 600px;
   width: 100%;
   border: 1px solid lightgray;
-  margin-bottom: 1em
+  margin-bottom: 1em;
+}
+
+.container {
+  padding-top: 4em;
 }
 
 #ta {
-  margin: 1em 0 1em 0
+  margin: 1em 0 1em 0;
+}
+
+#tab {
+  max-width: 40em;
+  margin: 0 auto 0 auto;
 }

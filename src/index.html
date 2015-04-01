@@ -12,10 +12,32 @@
     <script src="angular.js"></script>
     <script src="angular-ui-router.js"></script>
     <script src="vis.min.js"></script>
+    <script src="moment.js"></script>
     <script src="pert.js"></script>
     <script src="app.js"></script>
   </head>
   <body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Pert</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="#/">Edit</a></li>
+            <li><a href="#/table">Table</a></li>
+            <li><a href="#/pert">Pert</a></li>
+            <li><a href="#/gantt">Gantt</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
     <div class="container" ui-view></div>
   </body>
 </html>

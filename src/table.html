@@ -1,0 +1,16 @@
+<table id="tab" class="table" ng-controller="tableController">
+  <tr>
+    <td><b>#</b></td>
+    <td><b>Duration (days)</b></td>
+    <td><b>Start Day</b></td>
+    <td><b>End Day</b></td>
+    <td><b>Possible Delay</b></td>
+  </tr>
+  <tr ng-repeat="item in list">
+    <td>{{item.id}}</td>
+    <td>{{item.duration}}</td>
+    <td>{{item.startDay}}</td>
+    <td>{{item.endDay}} --- {{item.endDay + (item.permittedDelay || 0)}}</td>
+    <td>{{item.permittedDelay || 0}}</td>
+  </tr>
+</table>

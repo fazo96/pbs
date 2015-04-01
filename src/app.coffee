@@ -17,18 +17,25 @@ pertApp.config ($stateProvider,$urlRouterProvider) ->
     controller: pertController
 
 
-pertController = ($scope) ->
-  toDates = (list, startDay) ->
-    list.map (i) ->
-      r = content: ""+i.id, id: i.id
-      if i.startDay? then r.start = moment(startDay).add(i.startDay, 'days').format 'YYYY-MM-DD'
-      if i.endDay? then r.end = moment(startDay).add(i.endDay, 'days').format 'YYYY-MM-DD'
-      return r
+  $stateProvider.state 'gantt',
+    url: '/gantt'
+    templateUrl: 'gantt.html'
+    controller: pertController
+  
+  $stateProvider.state 'table',
+    url: '/table'
+    templateUrl: 'table.html'
+    controller: pertController
 
-  buildTimeline = (data) ->
-    timeline = new vis.Timeline (document.getElementById 'timeline'), (toDates data.activities), {}
+pertApp.controller 'tableController', ($scope) ->
+  $scope.list = []
+  ls = $scope.fromLocalStorage()
+  if ls?
+    $scope.list = ls.activities
 
-  buildGraph = (data) ->
+pertApp.controller 'pertDiagController', ($scope) ->
+  $scope.buildGraph = (data) ->
+    if !data? then return
     nodes = data.days.map (x) -> {id: x, label: ""+x}
     connections = []
     data.activities.forEach (x) ->
@@ -49,17 +56,29 @@ pertController = ($scope) ->
         edges:
           style: 'arrow'
       network = new vis.Network (document.getElementById 'pert'), { nodes: nodes, edges: connections }, options
+  $scope.buildGraph $scope.fromLocalStorage()
 
-  fromLocalStorage = ->
-    data = localStorage.getItem 'ganttpert'
+pertApp.controller 'ganttDiagController', ($scope) ->
+  $scope.toDates = (list, startDay) ->
+    list.map (i) ->
+      r = content: ""+i.id, id: i.id
+      if i.startDay? then r.start = moment(startDay).add(i.startDay, 'days').format 'YYYY-MM-DD'
+      if i.endDay? then r.end = moment(startDay).add(i.endDay, 'days').format 'YYYY-MM-DD'
+      return r
+  $scope.buildTimeline = (data) ->
+    if !data? then return
+    timeline = new vis.Timeline (document.getElementById 'timeline'), ($scope.toDates data.activities), {}
+  $scope.buildTimeline $scope.fromLocalStorage()
+
+pertController = ($scope) ->
+  $scope.fromLocalStorage = (item) ->
+    data = localStorage.getItem item || 'ganttpert'
     if data
       try
         jdata = JSON.parse data
       catch e
         return swal 'JSON Error', e, 'error'
       if jdata
-        buildGraph new Pert(jdata).calculate()
+        return new Pert(jdata).calculate()
       else return swal 'Error', 'no JSON?', 'error'
     else swal 'Error', 'no data to parse', 'error'
-
-  fromLocalStorage()
