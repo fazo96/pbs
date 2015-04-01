@@ -1,4 +1,5 @@
 <div ng-controller="rawEditorController">
-  <textarea id="ta" class="form-control" rows="10">{{rawdata}}</textarea>
-  <button class="btn btn-primary" ng-click="toLocalStorage($('#ta').val())">Save</button>
+  <textarea id="ta" class="form-control" ng-model="taData" rows="10"></textarea>
+  <button class="btn btn-primary" ng-click="saveData()">Save</button>
+  <button class="btn btn-info" ng-click="reloadData()">Reload</button>
 </div>

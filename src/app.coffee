@@ -35,9 +35,10 @@ pertApp.config ($stateProvider,$urlRouterProvider) ->
 
 pertController = ($scope) ->
   $scope.toLocalStorage = (data,options) ->
-    options = options || {}
+    options ?= {}
+    data ?= []
     try
-      console.log data
+      console.log "Saving: "+data
       localStorage.setItem 'ganttpert', JSON.stringify data
       unless options.silent
         swal 'Ok', 'Data updated', 'success'
@@ -54,8 +55,15 @@ pertController = ($scope) ->
       unless options.silent
         swal 'JSON Error', e, 'error'
       if options.raw
+        console.log 'Loading: []'
         return []
-      else return activities: [], days: []
+      else
+        console.log 'Loading: {list: [], days: []}'
+        return list: [], days: []
     if options.raw
+      console.log 'Loading: '+jdata
       return jdata
-    else return new Pert(jdata).calculate()
+    else
+      r = new Pert(jdata).calculate()
+      console.log 'Loading: '+r
+      return r

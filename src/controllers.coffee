@@ -46,7 +46,18 @@ pertApp.controller 'ganttDiagController', ($scope) ->
   $scope.buildTimeline $scope.fromLocalStorage()
 
 pertApp.controller 'rawEditorController', ($scope) ->
-  $scope.rawdata = $scope.fromLocalStorage silent: yes, raw: yes
+  $scope.saveData = ->
+    try
+      data = JSON.parse $scope.taData
+    catch e
+      return swal 'Error', 'The data entered is invalid', 'error'
+    $scope.toLocalStorage data
+  $scope.reloadData = ->
+    $scope.taData = JSON.stringify $scope.fromLocalStorage silent: yes, raw: yes
+  $scope.$on 'dataChanged', ->
+    $scope.reloadData()
+    #$('#ta').val JSON.stringify $scope.fromLocalStorage silent: yes, raw: yes
+  $scope.reloadData()
 
 pertApp.controller 'editorController', ($scope) ->
   $scope.clone = (id) ->
