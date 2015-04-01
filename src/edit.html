@@ -1,0 +1,42 @@
+<div ng-controller="editorController">
+  <div class="panel panel-default" ng-repeat="item in list">
+    <div class="panel-heading">
+      <div class="input-group">
+        <span class="input-group-addon">ID</span>
+        <input class="form-control" value="{{item.id}}" placeholder="id">
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="input-group">
+        <span class="input-group-addon">Duration</span>
+        <input class="form-control" value="{{item.duration}}" placeholder="(days)">
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon">Dependencies</span>
+        <input class="form-control" placeholder="id1 id2 id3" value="{{item.depends.join(' ')}}">
+      </div>
+      <button ng-click="delete(item.id)" class="btn btn-danger">Delete</button>
+      <button ng-click="clone(item.id)" class="btn btn-warn">Clone</button>
+    </div>
+  </div>
+  <!-- new item -->
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="input-group">
+        <span class="input-group-addon">ID</span>
+        <input class="form-control" placeholder="New Activity" id="new-id">
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="input-group">
+        <span class="input-group-addon">Duration</span>
+        <input class="form-control" id="new-duration" placeholder="(days)">
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon">Dependencies</span>
+        <input class="form-control" placeholder="id1 id2 id3">
+      </div>
+      <button ng-click="addNew($event)" class="btn btn-primary">Add</button>
+    </div>
+  </div>
+</div>

@@ -4,6 +4,7 @@ var minifyHTML = require('gulp-minify-html')
 var coffee = require('gulp-coffee')
 var uglify = require('gulp-uglify')
 var clean = require('gulp-clean')
+var markdown = require('gulp-markdown')
 
 gulp.task('css',function(){
   cssFiles = ["src/*.css","bower_components/vis/dist/vis.min.css",
@@ -21,6 +22,15 @@ gulp.task('html',function(){
                         .pipe(minifyHTML({ quotes: true }))
                         .pipe(gulp.dest('dist/'))
 })
+
+gulp.task('md',function(){
+  return gulp.src(['src/*.md','*.md'])
+                        .pipe(markdown())
+                        .pipe(gulp.dest('test/'))
+                        .pipe(minifyHTML({ quotes: true }))
+                        .pipe(gulp.dest('dist/'))
+})
+
 gulp.task('js',function(){
   jsFiles = ["src/*.js",
       "bower_components/jquery/dist/jquery.js",
@@ -51,6 +61,7 @@ gulp.task('clean',function(){
 gulp.task('watch',function(){
   gulp.watch('src/*.coffee',['coffee'])
   gulp.watch('src/*.css',['css'])
+  gulp.watch(['*.md','src/*.md'],['md'])
   gulp.watch('src/*.html',['html'])
 })
-gulp.task('default',['html','css','js','coffee'])
+gulp.task('default',['md','html','css','js','coffee'])
