@@ -1,8 +1,11 @@
 pertApp.controller 'tableController', ($scope) ->
   $scope.list = []
-  ls = $scope.fromLocalStorage()
-  if ls?
-    $scope.list = ls.activities
+  $scope.refreshTable = ->
+    ls = $scope.fromLocalStorage()
+    if ls?
+      $scope.list = ls.activities
+  $scope.$on 'dataChanged', $scope.refreshTable
+  $scope.refreshTable()
 
 pertApp.controller 'pertDiagController', ($scope) ->
   $scope.buildGraph = (data) ->
@@ -60,26 +63,32 @@ pertApp.controller 'rawEditorController', ($scope) ->
   $scope.reloadData()
 
 pertApp.controller 'editorController', ($scope) ->
+  $scope.list = []
   $scope.clone = (id) ->
-    for i,j of $scope.fromLocalStorage({raw: yes, silent: yes}).activities
+    for i,j of $scope.fromLocalStorage({raw: yes, silent: yes})
       if j.id is id
         $scope.addNew j.id, j.duration, j.depends
         swal 'Ok', id+' has been cloned', 'success'
         return
     swal 'Ops', 'could not find '+id, 'warning'
 
-  $scope.delete = (id) ->
+  $scope.delete = (index,id) ->
     newdata = $scope.fromLocalStorage raw: yes
     l = []
-    for i,j of newdata
-      if j.id isnt id
+    if id? then for i,j of newdata
+      if id isnt j.id
         l.push j
+    else for i,j of newdata
+      if parseInt(i) isnt index
+        l.push j
+    diff = newdata.length - l.length
     $scope.toLocalStorage l, silent: yes
-    swal 'Ok', 'done', 'success'
+    if diff isnt 1
+      swal 'Done', diff+' item(s) deleted', 'warning'
 
   $scope.addNew = (id, dur, deps) ->
-    dur ?= $('#new-duration').val()
-    id ?= $('#new-id').val()
+    dur ?= $('#new-duration').val().trim()
+    id ?= $('#new-id').val().trim()
     if !deps?
       deps = $('#new-deps').val().split(' ')
       if deps.length is 1 and deps[0] is ''
@@ -88,12 +97,20 @@ pertApp.controller 'editorController', ($scope) ->
       dur = parseInt dur
     catch e
       return swal 'Error', 'duration must be an integer', 'error'
+    try
+      id = parseInt id
+    catch e
+      return
+    for i,dep of deps
+      try
+        deps[i] = parseInt dep
+      catch e
+        return
     newdata = $scope.fromLocalStorage silent: yes, raw: yes
     newdata.push { id: id, duration: dur, depends: deps }
     $scope.toLocalStorage newdata, silent: yes
-
+  
   $scope.refreshEditor = ->
-    console.log 'drawing editor'
     data = $scope.fromLocalStorage { silent: yes, raw: yes }
     $scope.list = data || []
   $scope.$on 'dataChanged', $scope.refreshEditor

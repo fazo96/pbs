@@ -1,26 +1,6 @@
-<div ng-controller="editorController" class="activity-list">
-  <div class="panel panel-default" ng-repeat="item in list">
-    <div class="panel-heading">
-      <div class="input-group">
-        <span class="input-group-addon">ID</span>
-        <input class="form-control" value="{{item.id}}" placeholder="id">
-      </div>
-    </div>
-    <div class="panel-body">
-      <div class="input-group duration">
-        <span class="input-group-addon">Duration</span>
-        <input class="form-control" value="{{item.duration}}" placeholder="(days)">
-      </div>
-      <div class="input-group dependencies">
-        <span class="input-group-addon">Dependencies</span>
-        <input class="form-control" placeholder="id1 id2 id3" value="{{item.depends.join(' ')}}">
-      </div>
-      <button ng-click="delete(item.id)" class="btn btn-danger">Delete</button>
-      <button ng-click="clone(item.id)" class="btn btn-warn">Clone</button>
-    </div>
-  </div>
+<div ng-controller="editorController" class="pbs-editor">
   <!-- new item -->
-  <div class="panel panel-default">
+  <div class="panel panel-default new-activity-panel">
     <div class="panel-heading">
       <div class="input-group">
         <span class="input-group-addon">ID</span>
@@ -39,4 +19,28 @@
       <button ng-click="addNew()" class="btn btn-primary">Add</button>
     </div>
   </div>
+  <!-- item list -->
+  <table id="tab" class="table">
+    <tr>
+      <td><b>#</b></td>
+      <td><b>ID</b></td>
+      <td><b>Duration (days)</b></td>
+      <td><b>Dependencies</b></td>
+      <td><b>Commands</b></td>
+    </tr>
+    <tr ng-repeat="item in list">
+      <td>{{$index + 1}}</td>
+      <td>{{item.id}}</td>
+      <td>{{item.duration}}</td>
+      <td>{{item.depends || []}}</td>
+      <td>
+        <button class="btn btn-info" ng-click="clone(item.id)">
+          <i class="fa fa-copy"></i>
+        </button>
+        <button class="btn btn-danger" ng-click="delete($index)">
+          <i class="fa fa-remove"></i>
+        </button>
+      </td>
+    </tr>
+  </table>
 </div>
