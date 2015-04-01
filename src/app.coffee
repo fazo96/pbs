@@ -33,6 +33,7 @@ pertApp.config ($stateProvider,$urlRouterProvider,$locationProvider) ->
     templateUrl: 'table.html'
     controller: pertController
 
+# "Main" Controller
 pertController = ($scope) ->
   $scope.toLocalStorage = (data,options) ->
     options ?= {}

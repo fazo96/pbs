@@ -1,13 +1,19 @@
 <div ng-controller="editorController" class="pbs-editor">
+  <div class="text-center">
+    <h2>Editor</h2>
+    <p class="lead">Dependencies must be a list of IDs separated by space<br>
+    the program does not check cyclic or invalid dependencies for you</p>
+  </div>
   <!-- new item -->
   <div class="panel panel-default new-activity-panel">
     <div class="panel-heading">
+      <i class="fa fa-plus"></i> New Activity
+    </div>
+    <div class="panel-body">
       <div class="input-group">
         <span class="input-group-addon">ID</span>
         <input class="form-control" placeholder="New Activity" ng-model="newid" id="new-id">
       </div>
-    </div>
-    <div class="panel-body">
       <div class="input-group duration">
         <span class="input-group-addon">Duration</span>
         <input class="form-control" id="new-duration" placeholder="(days)">
@@ -16,7 +22,8 @@
         <span class="input-group-addon">Dependencies</span>
         <input class="form-control" placeholder="id1 id2 id3" id="new-deps">
       </div>
-      <button ng-click="addNew()" class="btn btn-primary">Add</button>
+      <button ng-click="addNew()" class="btn btn-primary">
+        <i class="fa fa-plus"></i> Add</button>
     </div>
   </div>
   <!-- item list -->
