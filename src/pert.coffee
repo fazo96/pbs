@@ -47,6 +47,23 @@ class Pert
     @insertDay item.startDay
     return item.startDay
 
+  calculateDelays: (item) =>
+    if !item.dependant? or item.dependant.length is 0 then return no
+    lowestFDelay = 0; fDelay = no; cDelay = no; lowestCDelay = 0
+    for j,i of item.dependant
+      x = @toActivity i
+      if x.permittedDelay > 0
+        if x.permittedDelay < lowestFDelay or fDelay is no
+          lowestFDelay = x.permittedDelay
+          fDelay = yes
+      if x.chainedDelay > 0
+        if x.chainedDelay < lowestCDelay or cDelay is no
+          lowestCDelay = x.chainedDelay
+          cDelay = yes
+    olDelay = item.chainedDelay
+    item.chainedDelay = lowestFDelay + lowestCDelay
+    return item.chainedDelay isnt olDelay
+
   # Find out which activity has the highest id
   highestID: => return @maxa(@list.map (x) -> x.id)
 
@@ -62,9 +79,16 @@ class Pert
 
   calculate: (options,cb) ->
     h = @highestID()
-    @list.forEach (x) =>
+    for x,i in @list
       @log '('+x.id+'/'+h+')'
       @calculateEndDay x
+    finished = no; i = 0
+    while !finished
+      i++; finished = yes
+      for x,i in @list
+        if @calculateDelays x
+          finished = no
+    @log "Done calculating delays. Took", i, "iterations"
     results = activities: @list, days: @days
     if options?.json
       if cb? then cb(JSON.stringify results)
@@ -72,4 +96,3 @@ class Pert
     else
       if cb? then cb(results)
       results
-if module? then module.exports = Pert
