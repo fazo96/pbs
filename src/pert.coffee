@@ -106,7 +106,6 @@ class Pert
           finished = no
     @log "Done calculating delays. Took", i, "iterations"
     for x,i in @list
-      console.log x
       if !x.depends? or x.depends.length is 0
         @calculateCriticalPaths [x.id]
     results = activities: @list, days: @days, criticalPaths: @criticalPaths

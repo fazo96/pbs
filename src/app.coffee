@@ -38,6 +38,8 @@ pertController = ($scope) ->
   $scope.toLocalStorage = (data,options) ->
     options ?= {}
     data ?= []
+    if !data.push?
+      return swal 'Error', 'data is not a list', 'error'
     try
       console.log "Saving: "+data
       localStorage.setItem 'ganttpert', JSON.stringify data
@@ -50,21 +52,23 @@ pertController = ($scope) ->
   $scope.fromLocalStorage = (options) ->
     options = options || {}
     data = localStorage.getItem options.name || 'ganttpert'
+    if data is null then data = "[]"
     try
       jdata = JSON.parse data
+      if jdata is null then jdata = []
     catch e
       unless options.silent
         swal 'JSON Error', e, 'error'
       if options.raw
-        console.log 'Loading: []'
+        #console.log 'Loading: []'
         return []
       else
-        console.log 'Loading: {list: [], days: []}'
+        #console.log 'Loading: {list: [], days: []}'
         return list: [], days: []
     if options.raw
-      console.log 'Loading: '+jdata
+      #console.log 'Loading: '+jdata
       return jdata
     else
       r = new Pert(jdata).calculate()
-      console.log 'Loading: '+r
+      #console.log 'Loading: '+r
       return r

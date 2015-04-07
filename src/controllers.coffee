@@ -12,7 +12,6 @@ pertApp.controller 'pertDiagController', ($scope) ->
     if !data? then return
     nodes = data.days.map (x) -> {id: x, label: ""+x}
     connections = []
-    console.log data.criticalPaths
     data.activities.forEach (x) ->
       connections.push
         from: x.startDay, to: x.endDay
@@ -101,18 +100,16 @@ pertApp.controller 'editorController', ($scope) ->
     catch e
       return swal 'Error', 'duration must be an integer', 'error'
     try
-      id = parseInt id
-    catch e
-      return
+      unless isNaN id
+        id = parseInt id
     for i,dep of deps
       try
-        deps[i] = parseInt dep
+        unless isNaN dep
+          deps[i] = parseInt dep
       catch e
-        return
     newdata = $scope.fromLocalStorage silent: yes, raw: yes
     if !newdata? or newdata is null or !newdata.push?
       newdata = []
-    console.log newdata
     newdata.push { id: id, duration: dur, depends: deps }
     $scope.toLocalStorage newdata, silent: yes
   
