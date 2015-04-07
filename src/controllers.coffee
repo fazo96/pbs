@@ -12,11 +12,12 @@ pertApp.controller 'pertDiagController', ($scope) ->
     if !data? then return
     nodes = data.days.map (x) -> {id: x, label: ""+x}
     connections = []
+    console.log data.criticalPaths
     data.activities.forEach (x) ->
       connections.push
         from: x.startDay, to: x.endDay
         label: x.id+" ("+(if x.permittedDelay > 0 then x.duration+"/"+(x.duration+x.permittedDelay) else x.duration)+")"
-        color: if !x.permittedDelay then 'red'
+        color: if x.critical then 'red' else if !x.permittedDelay then 'orange'
       if x.permittedDelay > 0
         connections.push
           from: x.endDay

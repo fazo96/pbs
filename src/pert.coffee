@@ -1,6 +1,7 @@
 class Pert
   constructor: (@list, @verbose) ->
     @days = []
+    @criticalPaths = []
 
   log: (x...) -> if @verbose then console.log chalk.bold("Pert:"), x...
   err: (x...) -> console.log chalk.bold (chalk.red "Pert:"), x...
@@ -64,6 +65,21 @@ class Pert
     item.chainedDelay = lowestFDelay + lowestCDelay
     return item.chainedDelay isnt olDelay
 
+  calculateCriticalPaths: (path) ->
+    @log "calculating path from",path
+    lastID = path[path.length - 1]
+    last = @toActivity lastID
+    if last.dependant? and last.dependant.length > 0
+      last.dependant.forEach (x) =>
+        ii = @toActivity x
+        unless ((ii.permittedDelay or 0) + (ii.chainedDelay or 0)) > 0
+          p = path; p.push x
+          @calculateCriticalPaths p
+    else
+      @log "calculated path", path
+      path.forEach (x) => @toActivity(x).critical = yes
+      @criticalPaths.push path
+
   # Find out which activity has the highest id
   highestID: => return @maxa(@list.map (x) -> x.id)
 
@@ -89,7 +105,11 @@ class Pert
         if @calculateDelays x
           finished = no
     @log "Done calculating delays. Took", i, "iterations"
-    results = activities: @list, days: @days
+    for x,i in @list
+      console.log x
+      if !x.depends? or x.depends.length is 0
+        @calculateCriticalPaths [x.id]
+    results = activities: @list, days: @days, criticalPaths: @criticalPaths
     if options?.json
       if cb? then cb(JSON.stringify results)
       JSON.stringify results
