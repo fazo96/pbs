@@ -20,7 +20,8 @@ class Pert
   toActivity: (id) =>
     if !@list? then @err "list is", @list
     item = {}
-    @list.forEach (x) -> if x.id is id then item = x
+    for i,x of @list
+      if x.id is id then item = x
     return item
 
   # Compute the item's end day 
@@ -42,7 +43,7 @@ class Pert
     item.startDay = @maxa item.depends.map(@toActivity).map @calculateEndDay
     @log "start day of",item.id,"is",item.startDay
     # write max delay time to each depend
-    item.depends.forEach (x) =>
+    for j,x of item.depends
       @log "checking permittedDelay to dependency", x, "of", item
       i = @toActivity x
       if !i.dependant? then i.dependant = [item.id]
@@ -60,8 +61,9 @@ class Pert
     lowestFDelay = 0; fDelay = no
     for j,i of item.dependant
       x = @toActivity i
-      if x.permittedDelay > 0 and (x.permittedDelay < lowestFDelay or fDelay is no)
-        lowestFDelay = x.permittedDelay
+      if !isNaN(x.permittedDelay) or x.permittedDelay < lowestFDelay or fDelay is no
+        @log "activity", i, "dependant on", item.id, "has the lowest delay for now ("+(x.permittedDelay or 0)+")"
+        lowestFDelay = x.permittedDelay or 0
         fDelay = yes
     olDelay = item.chainedDelay
     item.chainedDelay = lowestFDelay or 0
