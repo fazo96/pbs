@@ -58,15 +58,16 @@ class Pert
 
   calculateDelays: (item) =>
     if !item.dependant? or item.dependant.length is 0 then return no
-    lowestFDelay = 0; fDelay = no
+    lowestFDelay = 0; fDelay = no; cDelay = 0
     for j,i of item.dependant
       x = @toActivity i
       if !isNaN(x.permittedDelay) or x.permittedDelay < lowestFDelay or fDelay is no
         @log "activity", i, "dependant on", item.id, "has the lowest delay for now ("+(x.permittedDelay or 0)+")"
         lowestFDelay = x.permittedDelay or 0
+        cDelay = x.chainedDelay or 0
         fDelay = yes
     olDelay = item.chainedDelay
-    item.chainedDelay = lowestFDelay or 0
+    item.chainedDelay = lowestFDelay + cDelay
     @log "chained delay of", item.id, "is", item.chainedDelay
     return item.chainedDelay isnt olDelay
 
