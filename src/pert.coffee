@@ -1,10 +1,17 @@
 class Pert
   constructor: (@list, @verbose) ->
+    @verbose = true
     @days = []
     @criticalPaths = []
 
-  log: (x...) -> if @verbose then console.log chalk.bold("Pert:"), x...
-  err: (x...) -> console.log chalk.bold (chalk.red "Pert:"), x...
+  log: (x...) ->
+    if chalk?
+      console.log chalk.bold "[ Pert ]", x...
+    else console.log "[ Pert ]", x...
+  err: (x...) ->
+    if chalk?
+      console.log chalk.bold chalk.red("[ !Pert! ]"), x...
+    else console.log "[ !Pert! ]", x...
 
   # Returns the highest number in an array of numbers
   maxa: (l) -> return Math.max.apply null, l
@@ -50,19 +57,15 @@ class Pert
 
   calculateDelays: (item) =>
     if !item.dependant? or item.dependant.length is 0 then return no
-    lowestFDelay = 0; fDelay = no; cDelay = no; lowestCDelay = 0
+    lowestFDelay = 0; fDelay = no
     for j,i of item.dependant
       x = @toActivity i
-      if x.permittedDelay > 0
-        if x.permittedDelay < lowestFDelay or fDelay is no
-          lowestFDelay = x.permittedDelay
-          fDelay = yes
-      if x.chainedDelay > 0
-        if x.chainedDelay < lowestCDelay or cDelay is no
-          lowestCDelay = x.chainedDelay
-          cDelay = yes
+      if x.permittedDelay > 0 and (x.permittedDelay < lowestFDelay or fDelay is no)
+        lowestFDelay = x.permittedDelay
+        fDelay = yes
     olDelay = item.chainedDelay
-    item.chainedDelay = lowestFDelay + lowestCDelay
+    item.chainedDelay = lowestFDelay or 0
+    @log "chained delay of", item.id, "is", item.chainedDelay
     return item.chainedDelay isnt olDelay
 
   calculateCriticalPaths: (path) ->
@@ -72,12 +75,14 @@ class Pert
     if last.dependant? and last.dependant.length > 0
       last.dependant.forEach (x) =>
         ii = @toActivity x
-        unless ((ii.permittedDelay or 0) + (ii.chainedDelay or 0)) > 0
-          p = path; p.push x
-          @calculateCriticalPaths p
+        delay = ii.permittedDelay or 0
+        if delay is 0
+          @calculateCriticalPaths path.concat x
+        else
+          @log "dead end at", lastID, "-->", x, "because delay is", delay
     else
-      @log "calculated path", path
       path.forEach (x) => @toActivity(x).critical = yes
+      @log "calculated path", path
       @criticalPaths.push path
 
   # Find out which activity has the highest id
