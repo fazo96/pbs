@@ -1,9 +1,8 @@
 pertApp.controller 'tableController', ($scope) ->
   $scope.list = []
   $scope.refreshTable = ->
-    ls = $scope.fromLocalStorage()
-    if ls?
-      $scope.list = ls.activities
+    $scope.fromLocalStorage (ls) ->
+      if ls? then $scope.list = ls.activities
   $scope.$on 'dataChanged', $scope.refreshTable
   $scope.refreshTable()
 
@@ -32,7 +31,7 @@ pertApp.controller 'pertDiagController', ($scope) ->
       network = new vis.Network (document.getElementById 'pertDiagram'), { nodes: nodes, edges: connections }, options
   $scope.rebuild = ->
     console.log 'rebuild'
-    $scope.buildGraph $scope.fromLocalStorage()
+    $scope.fromLocalStorage (r) -> $scope.buildGraph r
   $scope.$on 'dataChanged', $scope.rebuild
   $scope.rebuild()
 
@@ -47,8 +46,8 @@ pertApp.controller 'ganttDiagController', ($scope) ->
     if !data? then return
     timeline = new vis.Timeline (document.getElementById 'timeline'), ($scope.toDates data.activities), {}
   $scope.$on 'dataChanged', ->
-    $scope.buildTimeline $scope.fromLocalStorage()
-  $scope.buildTimeline $scope.fromLocalStorage()
+    $scope.fromLocalStorage (r) -> $scope.buildTimeline r
+  $scope.fromLocalStorage (r) -> $scope.buildTimeline r
 
 pertApp.controller 'rawEditorController', ($scope) ->
   $scope.reset = ->
@@ -60,10 +59,9 @@ pertApp.controller 'rawEditorController', ($scope) ->
       swal 'Invalid Data', e, 'error'
     $scope.toLocalStorage data
   $scope.reloadData = ->
-    $scope.taData = JSON.stringify $scope.fromLocalStorage silent: yes, raw: yes
-  $scope.$on 'dataChanged', ->
-    $scope.reloadData()
-    #$('#ta').val JSON.stringify $scope.fromLocalStorage silent: yes, raw: yes
+    $scope.fromLocalStorage { silent: yes, raw: yes }, (x) ->
+      $scope.taData = JSON.stringify x
+  $scope.$on 'dataChanged', -> $scope.reloadData()
   $scope.reloadData()
 
 pertApp.controller 'editorController', ($scope) ->
@@ -77,18 +75,18 @@ pertApp.controller 'editorController', ($scope) ->
     swal 'Ops', 'could not find '+id, 'warning'
 
   $scope.delete = (index,id) ->
-    newdata = $scope.fromLocalStorage raw: yes
-    l = []
-    if id? then for i,j of newdata
-      if id isnt j.id
-        l.push j
-    else for i,j of newdata
-      if parseInt(i) isnt index
-        l.push j
-    diff = newdata.length - l.length
-    $scope.toLocalStorage l, silent: yes
-    if diff isnt 1
-      swal 'Done', diff+' item(s) deleted', 'warning'
+    $scope.fromLocalStorage { raw: yes }, (newdata) ->
+      l = []
+      if id? then for i,j of newdata
+        if id isnt j.id
+          l.push j
+      else for i,j of newdata
+        if parseInt(i) isnt index
+          l.push j
+      diff = newdata.length - l.length
+      $scope.toLocalStorage l, silent: yes
+      if diff isnt 1
+        swal 'Done', diff+' item(s) deleted', 'warning'
 
   $scope.addNew = (id, dur, deps) ->
     dur ?= $('#new-duration').val().trim()
@@ -109,14 +107,14 @@ pertApp.controller 'editorController', ($scope) ->
         unless isNaN dep
           deps[i] = parseInt dep
       catch e
-    newdata = $scope.fromLocalStorage silent: yes, raw: yes
-    if !newdata? or newdata is null or !newdata.push?
-      newdata = []
-    newdata.push { id: id, duration: dur, depends: deps }
-    $scope.toLocalStorage newdata, silent: yes
+    $scope.fromLocalStorage { silent: yes, raw: yes }, (newdata) ->
+      if !newdata? or newdata is null or !newdata.push?
+        newdata = []
+      newdata.push { id: id, duration: dur, depends: deps }
+      $scope.toLocalStorage newdata, silent: yes
   
   $scope.refreshEditor = ->
-    data = $scope.fromLocalStorage { silent: yes, raw: yes }
-    $scope.list = data || []
+    $scope.fromLocalStorage { silent: yes, raw: yes }, (data) ->
+      $scope.list = data || []
   $scope.$on 'dataChanged', $scope.refreshEditor
   $scope.refreshEditor()

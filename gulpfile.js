@@ -35,6 +35,7 @@ gulp.task('js',function(){
   jsFiles = ["src/*.js",
       "bower_components/jquery/dist/jquery.js",
       "bower_components/moment/moment.js",
+      "bower_components/async/lib/async.js",
       "bower_components/bootstrap/dist/js/bootstrap.js",
       "bower_components/bootstrap/js/collapse.js",
       "bower_components/angular/angular.js",

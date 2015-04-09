@@ -46,13 +46,15 @@ pertController = ($scope) ->
       localStorage.setItem 'ganttpert', sdata
       unless options.silent
         swal 'Ok', 'Data updated', 'success'
-      $scope.pbs = new PBS(data).calculate()
-      $scope.$broadcast 'dataChanged'
+      $scope.pbs = new PBS(data).calculate {}, ->
+        $scope.$broadcast 'dataChanged'
     catch e
       swal 'Error', e, 'error'
 
-  $scope.fromLocalStorage = (options) ->
+  $scope.fromLocalStorage = (options,cb) ->
     options = options || {}
+    if options.call? then cb = options
+    else unless cb?.call? then return console.log "fromLocalStorage called without callback"
     data = localStorage.getItem options.name || 'ganttpert'
     if data is null then data = "[]"
     try
@@ -63,13 +65,15 @@ pertController = ($scope) ->
         swal 'JSON Error', e, 'error'
       if options.raw
         #console.log 'Loading: []'
-        return []
+        cb []
       else
         #console.log 'Loading: {list: [], days: []}'
-        return list: [], days: []
+        cb list: [], days: []
     if options.raw
       #console.log 'Loading: '+jdata
-      return jdata
+      cb jdata
     else
       #console.log 'Loading: '+$scope.pbs
-      return $scope.pbs ?= new PBS(jdata).calculate()
+      new PBS(jdata).calculate (x) ->
+        $scope.pbs = x
+        cb x
