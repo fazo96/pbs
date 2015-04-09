@@ -1,11 +1,17 @@
-pertApp.controller 'tableController', ($scope) ->
+tableController = ($scope,getList) ->
   $scope.list = []
   $scope.refreshTable = ->
-    ls = $scope.fromLocalStorage()
-    if ls?
-      $scope.list = ls.activities
+    data = $scope.fromLocalStorage()
+    if data?
+      $scope.list = getList data
   $scope.$on 'dataChanged', $scope.refreshTable
   $scope.refreshTable()
+
+
+pertApp.controller 'tableController', ($scope) ->
+  tableController $scope, (data) -> data.activities or []
+pertApp.controller 'resourceTableController', ($scope) ->
+  tableController $scope, (data) -> data.resources or []
 
 pertApp.controller 'pertDiagController', ($scope) ->
   $scope.buildGraph = (data) ->
@@ -31,7 +37,6 @@ pertApp.controller 'pertDiagController', ($scope) ->
           style: 'arrow'
       network = new vis.Network (document.getElementById 'pertDiagram'), { nodes: nodes, edges: connections }, options
   $scope.rebuild = ->
-    console.log 'rebuild'
     $scope.buildGraph $scope.fromLocalStorage()
   $scope.$on 'dataChanged', $scope.rebuild
   $scope.rebuild()
@@ -52,7 +57,7 @@ pertApp.controller 'ganttDiagController', ($scope) ->
 
 pertApp.controller 'rawEditorController', ($scope) ->
   $scope.reset = ->
-    $scope.toLocalStorage []
+    $scope.toLocalStorage { activities: [], resources: [] }
   $scope.saveData = ->
     try
       data = JSON.parse $scope.taData
@@ -61,46 +66,55 @@ pertApp.controller 'rawEditorController', ($scope) ->
     $scope.toLocalStorage data
   $scope.reloadData = ->
     $scope.taData = JSON.stringify $scope.fromLocalStorage silent: yes, raw: yes
-  $scope.$on 'dataChanged', ->
-    $scope.reloadData()
-    #$('#ta').val JSON.stringify $scope.fromLocalStorage silent: yes, raw: yes
+  $scope.$on 'dataChanged', $scope.reloadData
   $scope.reloadData()
 
 pertApp.controller 'editorController', ($scope) ->
-  $scope.list = []
-  $scope.clone = (id) ->
-    for i,j of $scope.fromLocalStorage({raw: yes, silent: yes})
+  $scope.activities = []
+  $scope.resources = []
+  $scope.actID = ''; $scope.actDur = ''; $scope.actDeps = ''
+  $scope.resID = ''; $scope.resName = ''; $scope.resAss = ''
+  $scope.clone = (isResource, id) ->
+    data = $scope.fromLocalStorage({raw: yes, silent: yes})
+    l = if isResource then data.resources else data.activities
+    for i,j of $scope.fromLocalStorage({raw: yes, silent: yes}).activities
       if j.id is id
         $scope.addNew j.id, j.duration, j.depends
         swal 'Ok', id+' has been cloned', 'success'
         return
     swal 'Ops', 'could not find '+id, 'warning'
 
-  $scope.delete = (index,id) ->
+  $scope.delete = (isResource, index,id) ->
     newdata = $scope.fromLocalStorage raw: yes
+    iter = if isResource then newdata.resources else newdata.activities
     l = []
-    if id? then for i,j of newdata
-      if id isnt j.id
+    if id? then for i,j of iter
+      if id isnt j.id and id isnt j.name
         l.push j
-    else for i,j of newdata
+    else for i,j of iter
       if parseInt(i) isnt index
         l.push j
-    diff = newdata.length - l.length
-    $scope.toLocalStorage l, silent: yes
+    diff = iter.length - l.length
+    if isResource
+      newdata.resources = l
+    else newdata.activities = l
+    $scope.toLocalStorage newdata, silent: yes
     if diff isnt 1
       swal 'Done', diff+' item(s) deleted', 'warning'
 
-  $scope.addNew = (id, dur, deps) ->
-    dur ?= $('#new-duration').val().trim()
-    id ?= $('#new-id').val().trim()
+  $scope.addNew = (isResource, id, dur, deps) ->
+    dur ?= if isResource then $scope.resName else $scope.actDur
+    id ?= if isResource then $scope.resID else $scope.actID
     if !deps?
-      deps = $('#new-deps').val().split(' ')
+      deps = if isResource then $scope.resAss else $scope.actDeps
+      deps = deps.split ' '
       if deps.length is 1 and deps[0] is ''
         deps = []
-    try
-      dur = parseInt dur
-    catch e
-      return swal 'Error', 'duration must be an integer', 'error'
+    if !isResource
+      try
+        dur = parseInt dur
+      catch e
+        return swal 'Error', 'duration must be an integer', 'error'
     try
       unless isNaN id
         id = parseInt id
@@ -110,13 +124,22 @@ pertApp.controller 'editorController', ($scope) ->
           deps[i] = parseInt dep
       catch e
     newdata = $scope.fromLocalStorage silent: yes, raw: yes
-    if !newdata? or newdata is null or !newdata.push?
-      newdata = []
-    newdata.push { id: id, duration: dur, depends: deps }
-    $scope.toLocalStorage newdata, silent: yes
+    if isResource
+      if newdata?.resources?.push?
+        console.log newdata.resources
+        newdata.resources.push { id: id, name: dur, assignedTo: deps }
+        $scope.toLocalStorage newdata, silent: yes
+      else console.log "wtf cant add, data broken"
+    else
+      if newdata?.activities?.push?
+        newdata.activities.push { id: id, duration: dur, depends: deps }
+        $scope.toLocalStorage newdata, silent: yes
+      else console.log "wtf cant add, data broken"
+
   
   $scope.refreshEditor = ->
     data = $scope.fromLocalStorage { silent: yes, raw: yes }
-    $scope.list = data || []
+    $scope.activities = data.activities || []
+    $scope.resources = data.resources || []
   $scope.$on 'dataChanged', $scope.refreshEditor
   $scope.refreshEditor()

@@ -1,14 +1,17 @@
 class PBS
   constructor: (obj, @verbose, @errListener) ->
     @days = []
+    @resources = []
     @criticalPaths = []
+    @verbose = yes
     if obj.push # is a list
       @list = obj
     else if obj.activities
       @list = obj.activities
+      if obj.resources?.push? then @resources = obj.resources
     else
       @list = []
-      @err 'data is not an array nor a object with "activities" array' 
+      @err 'data is not an array nor a object with "activities" array'
 
   log: (x...) ->
     if @verbose
@@ -21,6 +24,24 @@ class PBS
     else console.log "[ !Pert! ]", x...
     if @errListener?.call? then @errListener x
 
+  compileResources: =>
+    @log 'compiling resources...'
+    if not @resources? then return
+    @resources.forEach (x) =>
+      @log 'processing resource', x
+      if x.assignedTo?.push? then x.assignedTo.forEach (i) =>
+        a = @toActivity i
+        a.assigned ?= []
+        a.assigned.push x.name or x.id
+    @list.forEach (x) =>
+      item = @toActivity x
+      if item.assigned?.push? then item.assigned.forEach (i) =>
+        res = @toResource i
+        if res
+          @log 'found', res, 'assigned to', item
+          res.assignedTo ?= []
+          res.assignedTo.push i
+
   # Returns the highest number in an array of numbers
   maxa: (l) -> return Math.max.apply null, l
 
@@ -30,6 +51,14 @@ class PBS
     item = {}
     for i,x of @list
       if x.id is id then item = x
+    return item
+
+  # Find the activity with given id
+  toResource: (id) =>
+    unless @resources?.push? then return
+    item = {}
+    for i,x of @resources
+      if x.id is id or x.name is id then item = x
     return item
 
   # Compute the item's end day 
@@ -83,11 +112,14 @@ class PBS
     @log "calculating path from",path
     lastID = path[path.length - 1]
     last = @toActivity lastID
-    if last.dependant? and last.dependant.length > 0
+    if last.permittedDelay > 0
+      @log "dead end at", lastID, "because its delay is", last.permittedDelay
+    else if last.dependant? and last.dependant.length > 0
       last.dependant.forEach (x) =>
         ii = @toActivity x
         delay = ii.permittedDelay or 0
         if delay is 0
+          @log 'following path from', last.id, 'to', ii.id, 'because', ii, 'has', ii.permittedDelay, 'days of free delay'
           @calculateCriticalPaths path.concat x
         else
           @log "dead end at", lastID, "-->", x, "because delay is", delay
@@ -124,13 +156,16 @@ class PBS
     for x,i in @list
       if !x.depends? or x.depends.length is 0
         @calculateCriticalPaths [x.id]
-    results = activities: @list, days: @days, criticalPaths: @criticalPaths
+    @compileResources()
+    results =
+      activities: @list
+      days: @days
+      criticalPaths: @criticalPaths
+      resources: @resources || []
+    @log 'Done', results
     if options?.json
       if cb? then cb(JSON.stringify results)
       JSON.stringify results
     else
       if cb? then cb(results)
       results
-
-# export module to node environment
-if module?.exports? then module.exports = PBS

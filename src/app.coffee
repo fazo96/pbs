@@ -33,13 +33,18 @@ pertApp.config ($stateProvider,$urlRouterProvider,$locationProvider) ->
     templateUrl: 'table.html'
     controller: pertController
 
+  $stateProvider.state 'resources',
+    url: '/resources'
+    templateUrl: 'resources.html'
+    controller: pertController
+
 # "Main" Controller
 pertController = ($scope) ->
   $scope.toLocalStorage = (data,options) ->
     options ?= {}
     data ?= []
-    if !data.push?
-      return swal 'Error', 'data is not a list', 'error'
+    if !data.push? and !data.activities?.push?
+      return swal 'Error', 'data is not a valid PBSlib object', 'error'
     try
       sdata = JSON.stringify data
       console.log "Saving: "+sdata
@@ -54,22 +59,17 @@ pertController = ($scope) ->
   $scope.fromLocalStorage = (options) ->
     options = options || {}
     data = localStorage.getItem options.name || 'ganttpert'
-    if data is null then data = "[]"
+    if data is null then data = '{"activities":[], "resources":[]}'
     try
       jdata = JSON.parse data
-      if jdata is null then jdata = []
+      if jdata is null then jdata = activities: [], resources: []
     catch e
       unless options.silent
         swal 'JSON Error', e, 'error'
-      if options.raw
-        #console.log 'Loading: []'
-        return []
-      else
-        #console.log 'Loading: {list: [], days: []}'
-        return list: [], days: []
+      return activities: [], resources: []
     if options.raw
       #console.log 'Loading: '+jdata
       return jdata
     else
       #console.log 'Loading: '+$scope.pbs
-      return $scope.pbs ?= new PBS(jdata).calculate()
+      return $scope.pbs = new PBS(jdata).calculate()
