@@ -41,10 +41,12 @@ pertController = ($scope) ->
     if !data.push?
       return swal 'Error', 'data is not a list', 'error'
     try
-      console.log "Saving: "+data
-      localStorage.setItem 'ganttpert', JSON.stringify data
+      sdata = JSON.stringify data
+      console.log "Saving: "+sdata
+      localStorage.setItem 'ganttpert', sdata
       unless options.silent
         swal 'Ok', 'Data updated', 'success'
+      $scope.pbs = new PBS(data).calculate()
       $scope.$broadcast 'dataChanged'
     catch e
       swal 'Error', e, 'error'
@@ -69,6 +71,5 @@ pertController = ($scope) ->
       #console.log 'Loading: '+jdata
       return jdata
     else
-      r = new Pert(jdata).calculate()
-      #console.log 'Loading: '+r
-      return r
+      #console.log 'Loading: '+$scope.pbs
+      return $scope.pbs ?= new PBS(jdata).calculate()

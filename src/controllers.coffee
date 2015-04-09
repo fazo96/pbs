@@ -30,9 +30,11 @@ pertApp.controller 'pertDiagController', ($scope) ->
         edges:
           style: 'arrow'
       network = new vis.Network (document.getElementById 'pertDiagram'), { nodes: nodes, edges: connections }, options
-  $scope.$on 'dataChanged', ->
+  $scope.rebuild = ->
+    console.log 'rebuild'
     $scope.buildGraph $scope.fromLocalStorage()
-  $scope.buildGraph $scope.fromLocalStorage()
+  $scope.$on 'dataChanged', $scope.rebuild
+  $scope.rebuild()
 
 pertApp.controller 'ganttDiagController', ($scope) ->
   $scope.toDates = (list, startDay) ->

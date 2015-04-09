@@ -1,13 +1,13 @@
-class Pert
+class PBS
   constructor: (@list, @verbose) ->
-    @verbose = true
     @days = []
     @criticalPaths = []
 
   log: (x...) ->
-    if chalk?
-      console.log chalk.bold "[ Pert ]", x...
-    else console.log "[ Pert ]", x...
+    if @verbose
+      if chalk?
+        console.log chalk.bold "[ Pert ]", x...
+      else console.log "[ Pert ]", x...
   err: (x...) ->
     if chalk?
       console.log chalk.bold chalk.red("[ !Pert! ]"), x...
