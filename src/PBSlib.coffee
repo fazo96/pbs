@@ -1,7 +1,14 @@
 class PBS
-  constructor: (@list, @verbose) ->
+  constructor: (obj, @verbose, @errListener) ->
     @days = []
     @criticalPaths = []
+    if obj.push # is a list
+      @list = obj
+    else if obj.activities
+      @list = obj.activities
+    else
+      @list = []
+      @err 'data is not an array nor a object with "activities" array' 
 
   log: (x...) ->
     if @verbose
@@ -10,8 +17,9 @@ class PBS
       else console.log "[ Pert ]", x...
   err: (x...) ->
     if chalk?
-      console.log chalk.bold chalk.red("[ !Pert! ]"), x...
+      console.log chalk.bold chalk.red("[ Pert ]"), x...
     else console.log "[ !Pert! ]", x...
+    if @errListener?.call? then @errListener x
 
   # Returns the highest number in an array of numbers
   maxa: (l) -> return Math.max.apply null, l
@@ -123,3 +131,6 @@ class PBS
     else
       if cb? then cb(results)
       results
+
+# export module to node environment
+if module?.exports? then module.exports = PBS
