@@ -95,16 +95,21 @@ class PBS
 
   calculateDelays: (item) =>
     if !item.dependant? or item.dependant.length is 0 then return no
-    lowestFDelay = 0; fDelay = no; cDelay = 0
-    for j,i of item.dependant
-      x = @toActivity i
-      if !isNaN(x.permittedDelay) or x.permittedDelay < lowestFDelay or fDelay is no
-        @log "activity", i, "dependant on", item.id, "has the lowest delay for now ("+(x.permittedDelay or 0)+")"
-        lowestFDelay = x.permittedDelay or 0
-        cDelay = x.chainedDelay or 0
-        fDelay = yes
     olDelay = item.chainedDelay
-    item.chainedDelay = lowestFDelay + cDelay
+    if item.critical
+      @log item.id, 'is critical: no chained delays'
+      item.chainedDelay = 0
+    else
+      lowestFDelay = 0; fDelay = no; cDelay = 0
+      for j,i of item.dependant
+        x = @toActivity i
+        if !isNaN(x.permittedDelay) or x.permittedDelay < lowestFDelay or fDelay is no
+          @log "activity", i, "dependant on", item.id, "has the lowest delay for now ("+(x.permittedDelay or 0)+")"
+          lowestFDelay = x.permittedDelay or 0
+          cDelay = x.chainedDelay or 0
+          fDelay = yes
+      olDelay = item.chainedDelay
+      item.chainedDelay = lowestFDelay + cDelay
     @log "chained delay of", item.id, "is", item.chainedDelay
     return item.chainedDelay isnt olDelay
 
@@ -142,10 +147,15 @@ class PBS
     return @
 
   calculate: (options,cb) ->
-    h = @highestID()
+    # Calculate startDay, endDay, freeDelay
     for x,i in @list
-      @log '('+x.id+'/'+h+')'
+      @log '('+i+'/'+@list.length+')'
       @calculateEndDay x
+    # Calculate Critical Paths
+    for x,i in @list
+      if !x.depends? or x.depends.length is 0
+        @calculateCriticalPaths [x.id]
+    # Calculate chained Delays
     finished = no; i = 0
     while !finished
       i++; finished = yes
@@ -153,10 +163,9 @@ class PBS
         if @calculateDelays x
           finished = no
     @log "Done calculating delays. Took", i, "iterations"
-    for x,i in @list
-      if !x.depends? or x.depends.length is 0
-        @calculateCriticalPaths [x.id]
+    # Compile resource information
     @compileResources()
+    # done
     results =
       activities: @list
       days: @days

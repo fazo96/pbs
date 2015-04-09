@@ -3,10 +3,10 @@
   <p class="lead">The RawEditor is intended for importing, exporting your data
   and debugging.<br>Keep backups outside of this application if you rely on your data</p>
   <textarea id="ta" class="form-control" ng-model="taData" rows="10"></textarea>
-  <button class="btn btn-primary" ng-click="saveData()">
+  <button class="btn btn-primary" ng-click="saveData(true)">
     <i class="fa fa-check"></i> Save</button>
-  <button class="btn btn-info" ng-click="reloadData()">
+  <button class="btn btn-info" ng-click="reloadData(true)">
     <i class="fa fa-refresh"></i> Reload</button>
-  <button class="btn btn-warning" ng-click="reset()">
+  <button class="btn btn-warning" ng-click="reset(true)">
     <i class="fa fa-bomb"></i> Reset</button>
 </div>

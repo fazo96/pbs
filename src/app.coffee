@@ -42,9 +42,9 @@ pertApp.config ($stateProvider,$urlRouterProvider,$locationProvider) ->
 pertController = ($scope) ->
   $scope.toLocalStorage = (data,options) ->
     options ?= {}
-    data ?= []
-    if !data.push? and !data.activities?.push?
-      return swal 'Error', 'data is not a valid PBSlib object', 'error'
+    data ?= activities: [], resources: []
+    if not data.activities?.push?
+      return swal 'Error', 'invalid data format. Try resetting', 'error'
     try
       sdata = JSON.stringify data
       console.log "Saving: "+sdata

@@ -12,16 +12,16 @@ pertApp.controller 'tableController', ($scope) ->
   tableController $scope, (data) -> data.activities or []
 pertApp.controller 'resourceTableController', ($scope) ->
   tableController $scope, (data) -> data.resources or []
-
 pertApp.controller 'pertDiagController', ($scope) ->
   $scope.buildGraph = (data) ->
     if !data? then return
     nodes = data.days.map (x) -> {id: x, label: ""+x}
     connections = []
     data.activities.forEach (x) ->
+      maxDuration = x.duration + (x.permittedDelay or 0) + (x.chainedDelay or 0)
       connections.push
         from: x.startDay, to: x.endDay
-        label: x.id+" ("+(if x.permittedDelay > 0 then x.duration+"/"+(x.duration+x.permittedDelay) else x.duration)+")"
+        label: x.id+" ("+(if maxDuration isnt x.duration then x.duration+"/"+maxDuration else x.duration)+")"
         color: if x.critical then 'red' else if !x.permittedDelay then 'orange'
       if x.permittedDelay > 0
         connections.push
@@ -55,17 +55,36 @@ pertApp.controller 'ganttDiagController', ($scope) ->
     $scope.buildTimeline $scope.fromLocalStorage()
   $scope.buildTimeline $scope.fromLocalStorage()
 
+areYouSure = (text,cb) ->
+    swal {
+      title: "Are you sure?"
+      text: text
+      type: "warning"
+      showCancelButton: true
+      confirmButtonColor: "#DD6B55"
+      confirmButtonText: "Yes"
+      closeOnConfirm: yes
+    }, cb
+
 pertApp.controller 'rawEditorController', ($scope) ->
-  $scope.reset = ->
-    $scope.toLocalStorage { activities: [], resources: [] }
-  $scope.saveData = ->
+  $scope.reset = (askConfirm) ->
+    doIt = -> $scope.toLocalStorage { activities: [], resources: [] }
+    if askConfirm
+      areYouSure "ALL data will be lost!", doIt
+    else doIt()
+  $scope.saveData = (askConfirm) ->
     try
       data = JSON.parse $scope.taData
     catch e
-      swal 'Invalid Data', e, 'error'
-    $scope.toLocalStorage data
-  $scope.reloadData = ->
-    $scope.taData = JSON.stringify $scope.fromLocalStorage silent: yes, raw: yes
+      return swal 'Invalid Data', e, 'error'
+    doIt = -> $scope.toLocalStorage data
+    if askConfirm then areYouSure "Current saved data will be replaced by the data in the RawEditor", doIt
+    else doIt()
+  $scope.reloadData = (askConfirm) ->
+    doIt = ->
+      $scope.taData = JSON.stringify $scope.fromLocalStorage silent: yes, raw: yes
+    if askConfirm then areYouSure "Current saved data will be replaced by the data in the RawEditor", doIt
+    else doIt()
   $scope.$on 'dataChanged', $scope.reloadData
   $scope.reloadData()
 
