@@ -1,5 +1,6 @@
 bower_components/
 .divshot-cache/
+divshot-debug-log
 node_modules/
 test/
 testdata/

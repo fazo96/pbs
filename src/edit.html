@@ -86,7 +86,7 @@
       <td>{{$index + 1}}</td>
       <td>{{item.id}}</td>
       <td>{{item.name}}</td>
-      <td>{{item.assignedTo || []}}</td>
+      <td>{{item.assignedTo.join(', ') || "None"}}</td>
       <td>
         <button class="btn btn-info" ng-click="clone(true,item.id)">
           <i class="fa fa-copy"></i>
