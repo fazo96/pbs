@@ -23,7 +23,9 @@ class PBS
       console.log chalk.bold chalk.red("[ Pert ]"), x...
     else console.log "[ !Pert! ]", x...
     if @errListener?.call? then @errListener x
+    return x
 
+  # Already Async
   compileResources: =>
     @log 'compiling resources...'
     if not @resources? then return
@@ -46,6 +48,7 @@ class PBS
   maxa: (l) -> return Math.max.apply null, l
 
   # Find the activity with given id
+  #TODO: write async version 'withActivity'
   toActivity: (id) =>
     if !@list? then @err "list is", @list
     item = {}
@@ -54,12 +57,38 @@ class PBS
     return item
 
   # Find the activity with given id
+  #TODO: write async version 'withResource'
   toResource: (id) =>
     unless @resources?.push? then return
     item = {}
     for i,x of @resources
       if x.id is id or x.name is id then item = x
     return item
+
+  calculateFreeDelay: (dependencyID,dependantID) =>
+    @log "checking freeDelay to dependency", dependencyID, "of", dependantID
+    i = @toActivity dependencyID
+    dependant = @toActivity dependantID
+    if !i.dependant? then i.dependant = [dependant.id]
+    else i.dependant.push dependant.id
+    if !i.permittedDelay?
+      i.permittedDelay = dependant.startDay - @calculateEndDay i
+      @log "written permittedDelay to dependency", dependencyID, "of", dependant, "as", i.permittedDelay
+    else @log "aborting permittedDelay: already calculated"
+    @log "permitted delay of",dependencyID,"is",i.permittedDelay
+
+  # Find out which day the activity starts
+  calculateStartDay: (item) =>
+    if !item.depends? or item.depends.length is 0
+      @insertDay 0
+      return item.startDay = 0
+    item.startDay = @maxa item.depends.map(@toActivity).map @calculateEndDay
+    @log "start day of",item.id,"is",item.startDay
+    # write max delay time to each depend
+    for j,x of item.depends
+      @calculateFreeDelay x, item.id
+    @insertDay item.startDay
+    return item.startDay
 
   # Compute the item's end day 
   calculateEndDay: (item) =>
@@ -72,28 +101,7 @@ class PBS
     @insertDay item.endDay
     return item.endDay
 
-  # Find out which day the activity starts
-  calculateStartDay: (item) =>
-    if !item.depends? or item.depends.length is 0
-      @insertDay 0
-      return item.startDay = 0
-    item.startDay = @maxa item.depends.map(@toActivity).map @calculateEndDay
-    @log "start day of",item.id,"is",item.startDay
-    # write max delay time to each depend
-    for j,x of item.depends
-      @log "checking permittedDelay to dependency", x, "of", item
-      i = @toActivity x
-      if !i.dependant? then i.dependant = [item.id]
-      else i.dependant.push item.id
-      if !i.permittedDelay?
-        i.permittedDelay = item.startDay - @calculateEndDay i
-        @log "written permittedDelay to dependency", x, "of", item, "as", i.permittedDelay
-      else @log "aborting permittedDelay: already calculated"
-      @log "permitted delay of",x,"is",i.permittedDelay
-    @insertDay item.startDay
-    return item.startDay
-
-  calculateDelays: (item) =>
+  calculateChainedDelays: (item) =>
     if !item.dependant? or item.dependant.length is 0 then return no
     olDelay = item.chainedDelay
     if item.critical
@@ -146,23 +154,34 @@ class PBS
     @list = data
     return @
 
-  calculate: (options,cb) ->
-    # Calculate startDay, endDay, freeDelay
+  calculateEndDays: =>
     for x,i in @list
-      @log '('+i+'/'+@list.length+')'
+      @log 'StartDay, EndDay for ('+i+'/'+@list.length+')'
       @calculateEndDay x
-    # Calculate Critical Paths
+
+  calculateAllCriticalPaths: =>
     for x,i in @list
       if !x.depends? or x.depends.length is 0
         @calculateCriticalPaths [x.id]
-    # Calculate chained Delays
+
+  calculateAllChainedDelays: =>
     finished = no; i = 0
     while !finished
       i++; finished = yes
       for x,i in @list
-        if @calculateDelays x
+        if @calculateChainedDelays x
           finished = no
-    @log "Done calculating delays. Took", i, "iterations"
+    @log "Done calculating chained delays. Took", i, "iterations"
+
+  calculate: (options,cb) ->
+    #if !cb? or !cb.call?
+    #return @err 'calculate called without callback'
+    # Calculate startDay, endDay, freeDelay
+    @calculateEndDays()
+    # Calculate Critical Paths
+    @calculateAllCriticalPaths()
+    # Calculate chained Delays
+    @calculateAllChainedDelays()
     # Compile resource information
     @compileResources()
     # done
@@ -173,8 +192,10 @@ class PBS
       resources: @resources || []
     @log 'Done', results
     if options?.json
-      if cb? then cb(JSON.stringify results)
-      JSON.stringify results
+      if cb?.call?
+        cb null, JSON.stringify results
+      else return JSON.stringify results
     else
-      if cb? then cb(results)
-      results
+      if cb?.call?
+        cb null, results
+      else return results
