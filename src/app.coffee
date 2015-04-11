@@ -28,9 +28,9 @@ pertApp.config ($stateProvider,$urlRouterProvider,$locationProvider) ->
     templateUrl: 'gantt.html'
     controller: pertController
   
-  $stateProvider.state 'table',
-    url: '/table'
-    templateUrl: 'table.html'
+  $stateProvider.state 'activities',
+    url: '/activities'
+    templateUrl: 'activities.html'
     controller: pertController
 
   $stateProvider.state 'resources',
