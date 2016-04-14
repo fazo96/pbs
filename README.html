@@ -1,0 +1,9 @@
+<h1 id="pbs">PBS</h1><p>PBS is a small web app built to assist in working with Project Breakdown Structures.</p><p>It should be accessible <a href="http://pbsapp.divshot.io">here</a></p><h2 id="features">Features</h2><p>It&#39;s still in development.</p><ul><li>can calculate (almost) every info that can be retrieved from the minimum amount of data</li><li>can draw a (almost correct and thorough) pert diagram</li><li>can (almost) draw a timeline of the project</li></ul><h2 id="data-format">Data format</h2><p>This is a valid input document (extra data is ignored but not thrashed):</p><pre><code class="lang-json">[
+  {&quot;id&quot;: 0, &quot;duration&quot;: 3},
+  {&quot;id&quot;: 1, &quot;duration&quot;: 1},
+  {&quot;id&quot;: 2, &quot;duration&quot;: 2, &quot;depends&quot;: [0]},
+  {&quot;id&quot;: 3, &quot;duration&quot;: 5, &quot;depends&quot;: [1]},
+  {&quot;id&quot;: 4, &quot;duration&quot;: 5, &quot;depends&quot;: [1]},
+  {&quot;id&quot;: 5, &quot;duration&quot;: 2, &quot;depends&quot;: [2,3,4]}
+]
+</code></pre><h2 id="development">Development</h2><ol><li>Clone the repo</li><li>make sure you have <a href="http://gulpjs.com">gulp</a></li><li>run <code>npm install &amp;&amp; bower install &amp;&amp; gulp</code> to build the project</li><li>the resulting static website is in <code>dist/</code></li></ol><h2 id="license">License</h2><p>MIT</p>

@@ -1,0 +1,7 @@
+{
+  "name": "pbsapp",
+  "root": "dist",
+  "routes": {
+    "**": "index.html"
+  }
+}
